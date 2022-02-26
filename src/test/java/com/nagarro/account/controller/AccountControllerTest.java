@@ -138,6 +138,12 @@ class AccountControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void testFromAmountGreaterToAmount() throws Exception {
+        mockMvc.perform(get(PATH + "/filter?fromAmount=400&toAmount=200").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     /*
        Below Testcases are covered fromDate and toDate related code coverage
      */
@@ -192,7 +198,7 @@ class AccountControllerTest {
     @Test
     void testParseException() throws Exception {
         mockMvc.perform(get(PATH + "/filter?fromDate=01.02.mani&toDate=02.02.2022").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -235,5 +241,11 @@ class AccountControllerTest {
     void testGetStatementWithToDate() throws Exception {
         mockMvc.perform(get(PATH + "/filter?toDate=19.05.2020").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testFromDateGreaterToDate() throws Exception {
+        mockMvc.perform(get(PATH + "/filter?fromDate=01.01.2022&toDate=19.05.2020").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

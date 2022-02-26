@@ -18,6 +18,7 @@ import java.util.Objects;
 @Slf4j
 public class AccountUtil {
 
+    @SuppressWarnings("java:S108")
     public static List<StatementResponse> filterBasedOnDate(List<StatementResponse> statementResponseList, String fromDate, String toDate) {
         if(StringUtils.isEmpty(fromDate) || StringUtils.isEmpty(toDate)) {
             return statementResponseList;
@@ -35,7 +36,6 @@ public class AccountUtil {
                 }
             }
         } catch (ParseException ignored) {
-            log.error("Exception in parsing date");
         }
         return list;
     }

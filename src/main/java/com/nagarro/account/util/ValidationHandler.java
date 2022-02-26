@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ValidationHandler {
@@ -31,9 +34,7 @@ public class ValidationHandler {
             String day = dateArr[0];
             if(day.length() == 2) {
                 String month = dateArr[1];
-                if(month.length() == 2) {
-                    return true;
-                }
+                return month.length() == 2;
             }
         }
         return false;
@@ -49,6 +50,17 @@ public class ValidationHandler {
             if (!toDateResult) {
                 throw new InvalidInputException("toDate format is incorrect, , please input as (dd.MM.yyyy)");
             }
+            var formatter = new SimpleDateFormat("dd.MM.yyyy");
+            try{
+                var startDate = formatter.parse(fromDate);
+                var endDate = formatter.parse(toDate);
+                if(startDate.after(endDate)) {
+                    throw new InvalidInputException("fromDate value is invalid, " +
+                            "fromDate value should be less than or equal from toDate value");
+                }
+            } catch (ParseException ignored) {
+                throw new InvalidInputException("Date is invalid, Unable to parse it");
+            }
         }
     }
 
@@ -61,6 +73,12 @@ public class ValidationHandler {
             }
             if (!toAmountResult) {
                 throw new InvalidInputException("toAmount value is invalid");
+            }
+            var startAmount = Double.parseDouble(fromAmount);
+            var endAmount = Double.parseDouble(toAmount);
+            if(startAmount > endAmount) {
+                throw new InvalidInputException("fromAmount value is invalid, " +
+                        "fromAmount value should be less than or equal from toAmount value");
             }
         }
     }
