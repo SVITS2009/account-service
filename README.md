@@ -23,7 +23,7 @@ To the setup account-service application locally
   
       mvn spring-boot:run
 
-* SonarQube and Code coverage Report - report/SonarQube_CodeCoverage_Report.pdf
+* SonarQube and Code Coverage Report - Report/SonarQube_CodeCoverage_Report.pdf
 
 
 * Optional Information -
