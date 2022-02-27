@@ -13,6 +13,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+/**
+ * Implements LoginSecurityConfig class to secure the rest API.
+ * Override Configure(AuthenticationManagerBuilder) method to create 2 users as User1(username = admin, password = admin)
+ * and User2 (username = user, password = user)
+ *
+ * Override configure(HttpSecurity http) method to maintain single sign on per user.
+ *  performing role based API execution which can restrict other user to access the secure resources
+ *  Using BCryptPasswordEncoder to encode password
+ *  Using form based authentication to secure resources
+ *
+ *  If user tries to access restricted resource, server returns 403 forbidden as http status code,
+ *  to avoid that, implemented CustomAccessDeniedHandler to return 401 unauthorized with customize
+ *  message and details when uer tries to access restricted API.
+ */
+
 @Configuration
 @EnableWebSecurity
 public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
