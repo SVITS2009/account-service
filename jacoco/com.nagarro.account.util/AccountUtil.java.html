@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">account-service</a> &gt; <a href="index.source.html" class="el_package">com.nagarro.account.util</a> &gt; <span class="el_source">AccountUtil.java</span></div><h1>AccountUtil.java</h1><pre class="source lang-java linenums">package com.nagarro.account.util;
+
+import com.nagarro.account.dto.StatementResponse;
+import com.nagarro.account.exception.NotFoundException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Implements AccountUtil class to keep all common API
+ * which can be use in all classes.
+ * This class has functions like filter based on Date and Amount, masked accountNumber
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+<span class="fc" id="L24">@Slf4j</span>
+public class AccountUtil {
+
+    @SuppressWarnings(&quot;java:S108&quot;)
+    public static List&lt;StatementResponse&gt; filterBasedOnDate(
+            List&lt;StatementResponse&gt; statementResponseList, String fromDate, String toDate) {
+
+<span class="fc bfc" id="L31" title="All 4 branches covered.">        if(StringUtils.isEmpty(fromDate) || StringUtils.isEmpty(toDate)) {</span>
+<span class="fc" id="L32">            return statementResponseList;</span>
+        }
+<span class="fc" id="L34">        List&lt;StatementResponse&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L35">        var formatter = new SimpleDateFormat(&quot;dd.MM.yyyy&quot;);</span>
+        try {
+<span class="fc" id="L37">            var startDate = formatter.parse(fromDate);</span>
+<span class="fc" id="L38">            var endDate = formatter.parse(toDate);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            for (StatementResponse statementResponse : statementResponseList) {</span>
+<span class="fc" id="L40">                var accountDate = formatter.parse(statementResponse.getDate());</span>
+<span class="fc bfc" id="L41" title="All 4 branches covered.">                if((accountDate.equals(startDate) || accountDate.equals(endDate))</span>
+<span class="fc bfc" id="L42" title="All 4 branches covered.">                        || (accountDate.after(startDate) &amp;&amp; accountDate.before(endDate))) {</span>
+<span class="fc" id="L43">                    list.add(statementResponse);</span>
+                }
+<span class="fc" id="L45">            }</span>
+<span class="nc" id="L46">        } catch (ParseException ignored) {</span>
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">        return list;</span>
+    }
+
+    public static List&lt;StatementResponse&gt; filterBasedOnAmount(List&lt;StatementResponse&gt; statementResponseList,
+                                                              String fromAmount, String toAmount) {
+<span class="fc bfc" id="L53" title="All 4 branches covered.">        if(StringUtils.isEmpty(fromAmount) || StringUtils.isEmpty(toAmount)) {</span>
+<span class="fc" id="L54">            return statementResponseList;</span>
+        }
+<span class="fc" id="L56">        Double startAmount = Double.parseDouble(fromAmount);</span>
+<span class="fc" id="L57">        Double endAmount = Double.parseDouble(toAmount);</span>
+<span class="fc" id="L58">        List&lt;StatementResponse&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (StatementResponse statementResponse : statementResponseList) {</span>
+<span class="fc" id="L60">            Double accountAmount = Double.parseDouble(statementResponse.getAmount());</span>
+<span class="fc bfc" id="L61" title="All 4 branches covered.">            if((Objects.equals(accountAmount, startAmount) || Objects.equals(accountAmount, endAmount))</span>
+<span class="fc bfc" id="L62" title="All 4 branches covered.">            || (accountAmount &gt; startAmount &amp;&amp; accountAmount &lt; endAmount)) {</span>
+<span class="fc" id="L63">                list.add(statementResponse);</span>
+            }
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        return list;</span>
+    }
+
+    private static String maskedAccountNumber(String accountNumber) {
+<span class="fc" id="L70">        return accountNumber.replaceAll(&quot;\\d+&quot;, &quot;*************&quot;);</span>
+    }
+
+    public static List&lt;StatementResponse&gt; convertResultSet2AccountList(ResultSet rs) throws SQLException {
+<span class="fc" id="L74">        List&lt;StatementResponse&gt; statementResponseList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        while(rs.next()) {</span>
+<span class="fc" id="L76">            var statementResponse = new StatementResponse();</span>
+<span class="fc" id="L77">            statementResponse.setAccountId(rs.getInt(&quot;accountId&quot;));</span>
+<span class="fc" id="L78">            statementResponse.setStatementId(rs.getInt(&quot;statementId&quot;));</span>
+<span class="fc" id="L79">            statementResponse.setAccountType(rs.getString(&quot;account_type&quot;));</span>
+<span class="fc" id="L80">            statementResponse.setAccountNumber(maskedAccountNumber(rs.getString(&quot;account_number&quot;)));</span>
+<span class="fc" id="L81">            statementResponse.setDate(rs.getString(&quot;date&quot;));</span>
+<span class="fc" id="L82">            statementResponse.setAmount(rs.getString(&quot;amount&quot;));</span>
+<span class="fc" id="L83">            statementResponseList.add(statementResponse);</span>
+<span class="fc" id="L84">        }</span>
+<span class="fc" id="L85">        return statementResponseList;</span>
+    }
+
+    public static List&lt;StatementResponse&gt; isListEmpty(List&lt;StatementResponse&gt; statementResponseList) throws NotFoundException {
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if(statementResponseList.isEmpty()) {</span>
+<span class="fc" id="L90">            throw new NotFoundException(&quot;Statement(s) not exist&quot;);</span>
+        }
+<span class="fc" id="L92">        return statementResponseList;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

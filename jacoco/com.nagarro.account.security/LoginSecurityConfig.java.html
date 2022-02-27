@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">account-service</a> &gt; <a href="index.source.html" class="el_package">com.nagarro.account.security</a> &gt; <span class="el_source">LoginSecurityConfig.java</span></div><h1>LoginSecurityConfig.java</h1><pre class="source lang-java linenums">package com.nagarro.account.security;
+
+import com.nagarro.account.config.CustomAccessDeniedHandler;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+
+@Configuration
+@EnableWebSecurity
+<span class="fc" id="L18">public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+	@Override
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
+<span class="fc" id="L22">		auth.inMemoryAuthentication()</span>
+<span class="fc" id="L23">				.withUser(&quot;admin&quot;)</span>
+<span class="fc" id="L24">				.password(this.passwordEncoder().encode(&quot;admin&quot;))</span>
+<span class="fc" id="L25">				.roles(&quot;User1&quot;);</span>
+
+<span class="fc" id="L27">		auth.inMemoryAuthentication()</span>
+<span class="fc" id="L28">				.withUser(&quot;user&quot;)</span>
+<span class="fc" id="L29">				.password(this.passwordEncoder().encode(&quot;user&quot;))</span>
+<span class="fc" id="L30">				.roles(&quot;User2&quot;);</span>
+<span class="fc" id="L31">	}</span>
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+<span class="fc" id="L35">		http.sessionManagement()</span>
+<span class="fc" id="L36">				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);</span>
+
+<span class="fc" id="L38">		http.sessionManagement().maximumSessions(1);</span>
+
+<span class="fc" id="L40">		http.csrf().disable().authorizeRequests()</span>
+<span class="fc" id="L41">				.regexMatchers(HttpMethod.GET, &quot;/account/search/[0-9]+&quot;).access(&quot;hasRole('User2') or hasRole('User1')&quot;)</span>
+<span class="fc" id="L42">				.antMatchers(HttpMethod.GET, &quot;/account/search/{accountId}&quot;).access(&quot;hasRole('User1')&quot;)</span>
+<span class="fc" id="L43">				.anyRequest()</span>
+<span class="fc" id="L44">				.authenticated()</span>
+<span class="fc" id="L45">				.and()</span>
+<span class="fc" id="L46">				.formLogin();</span>
+
+<span class="fc" id="L48">		http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());</span>
+
+<span class="fc" id="L50">	}</span>
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L54">		return new BCryptPasswordEncoder(10);</span>
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+<span class="fc" id="L59">		return new CustomAccessDeniedHandler();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
