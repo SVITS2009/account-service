@@ -14,6 +14,7 @@ To the setup account-service application locally
 * Run install - mvn install
 
 * Running the application locally
+
   There are several ways to run a Spring Boot application on your local machine. One way is to
   1.) Run the main method in the com.nagarro.account.AccountServiceApplication class from your IDE.
   2.) Alternatively you can use the Spring Boot Maven plugin like so:
