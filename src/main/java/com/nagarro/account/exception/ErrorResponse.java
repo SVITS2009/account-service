@@ -6,6 +6,9 @@ import lombok.Getter;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * implement to keep all exception information
+ */
 @Getter
 @AllArgsConstructor
 public class ErrorResponse {

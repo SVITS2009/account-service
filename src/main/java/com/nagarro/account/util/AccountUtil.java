@@ -1,6 +1,7 @@
 package com.nagarro.account.util;
 
 import com.nagarro.account.dto.StatementResponse;
+import com.nagarro.account.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Implements AccountUtil class to keep all common API
+ * which can be use in all classes.
+ * This class has functions like filter based on Date and Amount, masked accountNumber
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class AccountUtil {
 
     @SuppressWarnings("java:S108")
-    public static List<StatementResponse> filterBasedOnDate(List<StatementResponse> statementResponseList, String fromDate, String toDate) {
+    public static List<StatementResponse> filterBasedOnDate(
+            List<StatementResponse> statementResponseList, String fromDate, String toDate) {
+
         if(StringUtils.isEmpty(fromDate) || StringUtils.isEmpty(toDate)) {
             return statementResponseList;
         }
@@ -73,6 +81,13 @@ public class AccountUtil {
             statementResponse.setDate(rs.getString("date"));
             statementResponse.setAmount(rs.getString("amount"));
             statementResponseList.add(statementResponse);
+        }
+        return statementResponseList;
+    }
+
+    public static List<StatementResponse> isListEmpty(List<StatementResponse> statementResponseList) throws NotFoundException {
+        if(statementResponseList.isEmpty()) {
+            throw new NotFoundException("Statement(s) not exist");
         }
         return statementResponseList;
     }

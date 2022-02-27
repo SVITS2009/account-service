@@ -11,11 +11,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Implements CustomExceptionHandler to provide customize response
+ * when backend API throws any Exception
+ * This class methods prepare errorResponse class object with
+ * timestamp, message(reason to fail) and details about API like URL
+ */
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(StatementNotFoundException.class)
-    public ResponseEntity<Object> statementNotFoundException(StatementNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> notFoundException(NotFoundException ex, WebRequest request) {
         String detail = request.getDescription(false);
         List<String> details = new ArrayList<>();
         details.add(detail);

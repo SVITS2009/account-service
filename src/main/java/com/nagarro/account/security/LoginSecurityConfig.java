@@ -1,5 +1,6 @@
-package com.nagarro.account.config;
+package com.nagarro.account.security;
 
+import com.nagarro.account.config.CustomAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -20,12 +22,12 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()
 				.withUser("admin")
 				.password(this.passwordEncoder().encode("admin"))
-				.roles("ADMIN");
+				.roles("User1");
 
 		auth.inMemoryAuthentication()
 				.withUser("user")
 				.password(this.passwordEncoder().encode("user"))
-				.roles("USER");
+				.roles("User2");
 	}
 	
 	@Override
@@ -36,16 +38,24 @@ public class LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().maximumSessions(1);
 
 		http.csrf().disable().authorizeRequests()
-				.antMatchers(HttpMethod.GET, "/account/search").access("hasRole('USER') or hasRole('ADMIN')")
-				.antMatchers(HttpMethod.GET, "/account/search/filter").access("hasRole('ADMIN')")
+				.regexMatchers(HttpMethod.GET, "/account/search/[0-9]+").access("hasRole('User2') or hasRole('User1')")
+				.antMatchers(HttpMethod.GET, "/account/search/{accountId}").access("hasRole('User1')")
 				.anyRequest()
 				.authenticated()
 				.and()
 				.formLogin();
+
+		http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(10);
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new CustomAccessDeniedHandler();
 	}
 }

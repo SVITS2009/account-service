@@ -7,6 +7,10 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Implements StatementResponse as DTO to store Account and statement
+ * information when we fetch from DB based on accountId
+ */
 @Setter
 @Getter
 @NoArgsConstructor

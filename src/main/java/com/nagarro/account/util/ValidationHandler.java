@@ -9,19 +9,21 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+/**
+ * Implements ValidationHandler class to keep all common API to validate input param
+ * which can be use in all classes.
+ * This class has functions like validate accountId, fromDate, toDate, fromAmount and toAmount
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ValidationHandler {
 
     public static Integer validateAccountId(String id) throws InvalidInputException {
-        if (StringUtils.isNotEmpty(id)) {
-            try {
-                return Integer.parseInt(id);
-            } catch (NumberFormatException nfe) {
-                throw new InvalidInputException("Id is incorrect");
-            }
+        try {
+            return Integer.parseInt(id);
+        } catch (NumberFormatException nfe) {
+            throw new InvalidInputException("accountId is incorrect");
         }
-        return null;
     }
 
     private static boolean validateDateFormat(String date) {
