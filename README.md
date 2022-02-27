@@ -32,9 +32,11 @@ To the setup account-service application locally
 
 - To update accessDB (.accdb) file path
     * src/main/resources/application.properties
+    
       spring.datasource.url=jdbc:ucanaccess://DB/accountsdb.accdb;openExclusive=false;ignoreCase=true
 
   Currently, reading ms access file from DB folder which is in project directory. if we want, we can update above properties based on requirenment.
+  
   Example - .accdb file is available in the path - D:\accessdb\accountsdb.accdb, and we want to connect with that. we have to update above properties.
 
   spring.datasource.url=jdbc:ucanaccess://D:/accessdb/accountsdb.accdb;openExclusive=false;ignoreCase=true
